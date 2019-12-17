@@ -27,23 +27,25 @@ router.post("/register", (req, res) => {
     });
 });
 
-
-router.post("/login", async (req, res) => {
+router.post("/login", (req, res) => {
   let { username, password } = req.body;
 
-  try {
-    const User = await users.findBy({ username });
+  Users.findBy({ username })
+    .first()
+    .then(user => {
+      if (user && bcrypt.compareSync(password, user.password)) {
+        const token = genToken(user);
+        res.status(200).json({ username: user.username, token: token });
+      } else {
+        res.status(401).json({ message: "You shall not pass!" });
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json(error);
+    });
+  });
 
-    if (User && bcrypt.compareSync(password, User.password)) {
-      const token = genToken(User);
-      res.status(200).json({ message: `Welcome, ${username}!`, token: token });
-    } else {
-      res.status(401).json({ message: "Invalid Creds" });
-    }
-  } catch (error) {
-    res.status(500).json({ error: "db error: ", error });
-  }
-});
 
 function genToken(user) {
   const payload = {

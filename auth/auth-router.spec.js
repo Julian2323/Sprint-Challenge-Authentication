@@ -7,7 +7,7 @@ describe("register", () => {
   it("should return status 201", async () => {
     const res = await request(server)
       .post("/api/auth/register")
-      .send({ username: "testj", password: "password1" });
+      .send({ username: "jacktest", password: "password2" });
     expect(res.status).toBe(201);
   });
 
